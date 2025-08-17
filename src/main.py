@@ -26,6 +26,7 @@ for audio_path in audio_paths:
         segments = model.transcribe(audio_path)
         for segment in segments:
             text_segments.append(segment.text)
+            text_segments.append("\n")
         text = "".join(text_segments)
 
         with open(f"{TEXT_OUT_DIR}/{audio_filename}.md", "w") as file:
