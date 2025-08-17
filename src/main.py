@@ -22,11 +22,14 @@ for audio_path in audio_paths:
     if not text_file_exists:
         print(f"Generating transcript for: {audio_filename}.MP3")
 
+        last_segment = ""
         text_segments = []
         segments = model.transcribe(audio_path)
         for segment in segments:
-            text_segments.append(segment.text)
-            text_segments.append("\n")
+            if last_segment != segment.text:
+                text_segments.append(segment.text)
+                text_segments.append("\n")
+            last_segment = segment.text
         text = "".join(text_segments)
 
         with open(f"{TEXT_OUT_DIR}/{audio_filename}.md", "w") as file:
