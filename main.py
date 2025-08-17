@@ -1,7 +1,7 @@
+from lightning_whisper_mlx import LightningWhisperMLX
 from dotenv import load_dotenv
 import glob 
 import os
-import whisper
 import re
 import warnings
 
@@ -9,7 +9,7 @@ load_dotenv()
 AUDIO_IN_DIR = os.getenv("AUDIO_IN_DIR")
 TEXT_OUT_DIR = os.getenv("TEXT_OUT_DIR")
 warnings.filterwarnings("ignore")
-model = whisper.load_model("medium.en")
+whisper = LightningWhisperMLX(model="distil-medium.en", batch_size=12, quant=None)
 
 audio_paths = glob.glob(f"{AUDIO_IN_DIR}/*.MP3") + glob.glob(f"{AUDIO_IN_DIR}/*.mp3")
 text_paths = glob.glob(f"{TEXT_OUT_DIR}/*.md")
@@ -21,8 +21,7 @@ for audio_path in audio_paths:
             text_file_exists = True
     if not text_file_exists:
         print(f"Generating transcript for: {audio_filename}.MP3")
-        result = model.transcribe(audio_path)
+        text = whisper.transcribe(audio_path)["text"].strip()
         with open(f"{TEXT_OUT_DIR}/{audio_filename}.md", "w") as file:
-            output_text = result["text"].strip()
-            file.write(output_text)
+            file.write(text)
 print("\nDone!")
